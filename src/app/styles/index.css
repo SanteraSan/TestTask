@@ -1,0 +1,8 @@
+body {
+  background-color: #f8f9fa;
+}
+
+.table thead.sticky-top th {
+  background-color: #fff;
+  z-index: 2;
+}
