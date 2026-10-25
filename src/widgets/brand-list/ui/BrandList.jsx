@@ -1,4 +1,4 @@
-import { AlertMessage, EmptyState, Loader, SelectableList } from '@/shared/ui'
+import { AlertMessage, EmptyState, Loader, OverlayScroll, SelectableList } from '@/shared/ui'
 
 export function BrandList({ status, error, items, selectedId, onSelect, onRetry }) {
   if (status === 'loading') {
@@ -28,7 +28,7 @@ export function BrandList({ status, error, items, selectedId, onSelect, onRetry 
   }
 
   return (
-    <div className="brand-list-scroll">
+    <OverlayScroll className="brand-list-scroll">
       <SelectableList
         items={items}
         selectedId={selectedId}
@@ -38,12 +38,12 @@ export function BrandList({ status, error, items, selectedId, onSelect, onRetry 
           <>
             <span className="d-block text-truncate">
               <span className="fw-semibold">{item.brand}</span>
-              {item.number ? <span> Арт.: {item.number}</span> : null}
+              {item.number ? <span className="small brand-article"> Арт.: {item.number}</span> : null}
             </span>
-            {item.name ? <span className="d-block small text-truncate">{item.name}</span> : null}
+            {item.name ? <span className="d-block text-truncate">{item.name}</span> : null}
           </>
         )}
       />
-    </div>
+    </OverlayScroll>
   )
 }

@@ -9,6 +9,7 @@ body {
 
 .data-table-frame {
   position: relative;
+  overflow: hidden;
   border: 1px solid #dee2e6;
   border-radius: 0.375rem;
   background: #fff;
@@ -76,6 +77,14 @@ body {
   box-shadow: none;
 }
 
+.data-table thead tr:first-child th:first-child {
+  border-top-left-radius: calc(0.375rem - 1px);
+}
+
+.data-table thead tr:first-child th:last-child {
+  border-top-right-radius: calc(0.375rem - 1px);
+}
+
 .data-table td {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -115,10 +124,33 @@ body {
   background: var(--bs-primary, #0d6efd);
 }
 
+.overlay-scroll {
+  position: relative;
+}
+
+.overlay-scroll-viewport {
+  max-height: inherit;
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+.overlay-scroll-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.overlay-scroll-bar {
+  top: 0;
+  bottom: 0;
+  height: auto;
+}
+
 .brand-list-scroll {
   --brand-row-height: 4.25rem;
-  max-height: calc(var(--brand-row-height) * 10);
-  overflow-y: auto;
+  max-height: calc(var(--brand-row-height) * 5);
+  overflow: hidden;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  background: #fff;
 }
 
 .brand-list-scroll .list-group-item {
@@ -127,6 +159,41 @@ body {
   justify-content: center;
   height: var(--brand-row-height);
   overflow: hidden;
+  border-left-width: 0;
+  border-right-width: 0;
+  border-radius: 0;
+}
+
+.brand-list-scroll .list-group-item:first-child {
+  border-top-width: 0;
+}
+
+.brand-list-scroll .list-group-item:last-child {
+  border-bottom-width: 0;
+}
+
+.brand-list-scroll .list-group-item-action {
+  color: var(--bs-list-group-action-hover-color);
+}
+
+.brand-list-scroll .list-group-item-action:not(.active):hover,
+.brand-list-scroll .list-group-item-action:not(.active):focus,
+.brand-list-scroll .list-group-item-action:not(.active):active {
+  color: var(--bs-list-group-action-hover-color);
+}
+
+.brand-list-scroll .brand-article {
+  color: var(--bs-secondary-color);
+}
+
+.brand-list-scroll .list-group-item-action:not(.active):hover .brand-article,
+.brand-list-scroll .list-group-item-action:not(.active):focus .brand-article,
+.brand-list-scroll .list-group-item-action:not(.active):active .brand-article {
+  color: var(--bs-secondary-color);
+}
+
+.brand-list-scroll .list-group-item.active .brand-article {
+  color: inherit;
 }
 
 .data-table-scroll thead .data-table-sort {

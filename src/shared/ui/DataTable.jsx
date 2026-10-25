@@ -4,7 +4,7 @@ import { initialColumnWidths, resizeColumnWidths, scaleColumnWidths } from './co
 
 const ROW_HEIGHT = 44
 
-export function DataTable({ columns, rows, sort, onSortChange, getRowKey }) {
+export function DataTable({ columns, rows, sort, onSortChange, getRowKey, visibleRowCount = 10 }) {
   const scrollRef = useRef(null)
   const thumbRef = useRef(null)
   const labelRefs = useRef(new Map())
@@ -12,6 +12,7 @@ export function DataTable({ columns, rows, sort, onSortChange, getRowKey }) {
   const minsRef = useRef(null)
   const containerWidthRef = useRef(0)
   const [widths, setWidths] = useState(null)
+  const [headerHeight, setHeaderHeight] = useState(0)
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => scrollRef.current,
@@ -62,6 +63,11 @@ export function DataTable({ columns, rows, sort, onSortChange, getRowKey }) {
     observer.observe(container)
     return () => observer.disconnect()
   }, [columnKey, columns, rows.length])
+
+  useLayoutEffect(() => {
+    const header = scrollRef.current?.querySelector('thead')
+    setHeaderHeight(header?.offsetHeight ?? 0)
+  }, [columnKey, visibleRowCount])
 
   useLayoutEffect(() => {
     const node = scrollRef.current
@@ -136,7 +142,12 @@ export function DataTable({ columns, rows, sort, onSortChange, getRowKey }) {
 
   return (
     <div className="data-table-frame">
-      <div ref={scrollRef} className="data-table-scroll" onScroll={(event) => syncScrollbar(event.currentTarget, thumbRef.current)}>
+      <div
+        ref={scrollRef}
+        className="data-table-scroll"
+        style={headerHeight > 0 ? { maxHeight: headerHeight + visibleRowCount * ROW_HEIGHT } : undefined}
+        onScroll={(event) => syncScrollbar(event.currentTarget, thumbRef.current)}
+      >
       <table
         className="table table-hover table-sm align-middle mb-0 data-table"
         style={{ width: widths ? `${widths.reduce((sum, width) => sum + width, 0)}px` : '100%' }}

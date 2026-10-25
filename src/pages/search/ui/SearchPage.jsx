@@ -18,6 +18,7 @@ import {
   selectOffersStatus,
   selectSelectedBrandId,
 } from '@/features/parts-search'
+import { countLabel } from '@/shared/lib/plural'
 import { useDebouncedValue } from '@/shared/lib/useDebouncedValue'
 import { BrandList } from '@/widgets/brand-list'
 import { OffersBoard } from '@/widgets/offers-board'
@@ -37,6 +38,7 @@ export function SearchPage() {
   const offersStatus = useSelector(selectOffersStatus)
   const offersError = useSelector(selectOffersError)
   const [sort, setSort] = useState(null)
+  const [visibleRowCount, setVisibleRowCount] = useState(10)
 
   useEffect(() => {
     const query = debouncedNumber.trim()
@@ -94,7 +96,12 @@ export function SearchPage() {
       </section>
 
       <section className="mb-4">
-        <h2 className="h5">Производители</h2>
+        <h2 className="h5 mb-3">
+          Производители
+          {brandsStatus === 'success' ? (
+            <span className="fw-normal text-secondary fs-6"> ({countLabel(brands.length, 'производитель', 'производителя', 'производителей')})</span>
+          ) : null}
+        </h2>
         <BrandList
           status={brandsStatus}
           error={brandsError}
@@ -107,7 +114,6 @@ export function SearchPage() {
 
       {brandsReady ? (
         <section>
-          <h2 className="h5">Предложения</h2>
           <OffersBoard
             status={offersStatus}
             error={offersError}
@@ -117,6 +123,8 @@ export function SearchPage() {
             onRetry={() => dispatch(retryOffers())}
             brandsReady={brandsReady}
             resetKey={selectedBrandId || 'none'}
+            visibleRowCount={visibleRowCount}
+            onVisibleRowCountChange={setVisibleRowCount}
           />
         </section>
       ) : null}
