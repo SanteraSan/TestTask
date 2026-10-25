@@ -1,6 +1,6 @@
 import { formatPrice } from '@/entities/goods'
 import { countLabel } from '@/shared/lib/plural'
-import { AlertMessage, DataTable, EmptyState, Loader } from '@/shared/ui'
+import { AlertMessage, DataTable, EmptyState, Loader, SelectMenu } from '@/shared/ui'
 
 const columns = [
   {
@@ -104,19 +104,12 @@ export function OffersBoard({
           ) : null}
         </h2>
         {status === 'success' && rows.length > 0 ? (
-          <label className="d-flex align-items-center gap-2 mb-0 text-secondary" htmlFor="visible-row-count">
-            Показывать
-            <select
-              id="visible-row-count"
-              className="form-select w-auto"
-              value={visibleRowCount}
-              onChange={(event) => onVisibleRowCountChange(Number(event.target.value))}
-            >
-              {VISIBLE_ROW_OPTIONS.map((count) => (
-                <option key={count} value={count}>{count}</option>
-              ))}
-            </select>
-          </label>
+          <SelectMenu
+            label="Показывать"
+            value={visibleRowCount}
+            options={VISIBLE_ROW_OPTIONS}
+            onChange={onVisibleRowCountChange}
+          />
         ) : null}
       </div>
       {body}
