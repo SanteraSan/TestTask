@@ -1,11 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
+import { configurePartsApi, partsSearchReducer } from '@/features/parts-search'
+import { createHsPriceApi } from '@/shared/api'
+import { readApiConfig } from '@/shared/config/env'
 
-function appReducer(state = { ready: true }) {
-  return state
-}
+configurePartsApi(createHsPriceApi(readApiConfig()))
 
 export const store = configureStore({
   reducer: {
-    app: appReducer,
+    partsSearch: partsSearchReducer,
   },
 })

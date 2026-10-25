@@ -1,0 +1,9 @@
+export const selectNumber = (state) => state.partsSearch.number
+export const selectQuery = (state) => state.partsSearch.query
+export const selectBrands = (state) => state.partsSearch.brands
+export const selectBrandsStatus = (state) => state.partsSearch.brandsStatus
+export const selectBrandsError = (state) => state.partsSearch.brandsError
+export const selectSelectedBrandId = (state) => state.partsSearch.selectedBrandId
+export const selectOffers = (state) => state.partsSearch.offers
+export const selectOffersStatus = (state) => state.partsSearch.offersStatus
+export const selectOffersError = (state) => state.partsSearch.offersError
