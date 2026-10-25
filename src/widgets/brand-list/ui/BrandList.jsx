@@ -1,4 +1,3 @@
-import { formatPrice } from '@/entities/goods'
 import { AlertMessage, EmptyState, Loader, SelectableList } from '@/shared/ui'
 
 export function BrandList({ status, error, items, selectedId, onSelect, onRetry }) {
@@ -29,26 +28,22 @@ export function BrandList({ status, error, items, selectedId, onSelect, onRetry 
   }
 
   return (
-    <SelectableList
-      items={items}
-      selectedId={selectedId}
-      onSelect={onSelect}
-      getItemId={(item) => item.id}
-      renderItem={(item) => (
-        <span className="d-flex justify-content-between align-items-start gap-3 text-start">
-          <span className="text-truncate">
-            <span className="fw-semibold d-block text-truncate">{item.brand}</span>
-            <span className="d-block small text-truncate">{item.name}</span>
-            <span className="d-block small text-truncate">{item.number}</span>
-          </span>
-          <span className="text-end small text-nowrap">
-            <span className="d-block">
-              {item.minPrice == null ? 'Нет предложений' : `от ${formatPrice(item.minPrice)}`}
+    <div className="brand-list-scroll">
+      <SelectableList
+        items={items}
+        selectedId={selectedId}
+        onSelect={onSelect}
+        getItemId={(item) => item.id}
+        renderItem={(item) => (
+          <>
+            <span className="d-block text-truncate">
+              <span className="fw-semibold">{item.brand}</span>
+              {item.number ? <span> {item.number}</span> : null}
             </span>
-            <span className="d-block">{item.stock} шт.</span>
-          </span>
-        </span>
-      )}
-    />
+            {item.name ? <span className="d-block small text-truncate">{item.name}</span> : null}
+          </>
+        )}
+      />
+    </div>
   )
 }

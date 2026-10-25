@@ -1,6 +1,6 @@
 export { formatPrice, formatShipmentDate } from './lib/format'
 export { isEmptyGood, normalizeGoods } from './lib/normalizeGoods'
-export { sortOfferRows } from './lib/sortOfferRows'
+export { nextColumnSort, sortOfferRows } from './lib/sortOfferRows'
 export { toBrandOptions } from './lib/toBrandOptions'
 export { toOfferRows } from './lib/toOfferRows'
 export { minWarehousePrice } from './lib/warehousePrice'

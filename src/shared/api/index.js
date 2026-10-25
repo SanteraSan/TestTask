@@ -1,5 +1,5 @@
 export { ApiError, isAbortError } from './ApiError'
-export { createHsPriceApi, REQUEST_TIMEOUT_MS } from './createHsPriceApi'
+export { createHsPriceApi } from './createHsPriceApi'
 export { HsPriceApi } from './HsPriceApi'
 export { HttpClient } from './HttpClient'
 export { apiMessages } from './messages'

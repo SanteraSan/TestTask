@@ -110,6 +110,17 @@ describe('partsSearch', () => {
     expect(searchByNumber).toHaveBeenCalledTimes(1)
   })
 
+  it('repeats the request when search is forced', async () => {
+    const searchByNumber = vi.fn(async () => ({ goods: [good('FEBI')] }))
+    configurePartsApi({ searchByNumber })
+    const store = createStore()
+
+    await store.dispatch(requestBrands('01089'))
+    await store.dispatch(requestBrands('01089', { force: true }))
+
+    expect(searchByNumber).toHaveBeenCalledTimes(2)
+  })
+
   it('loads offers for the chosen brand and keeps brands on failure', async () => {
     const searchAnalogues = vi
       .fn()

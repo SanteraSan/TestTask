@@ -7,7 +7,131 @@ body {
   z-index: 2;
 }
 
+.data-table-frame {
+  position: relative;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  background: #fff;
+}
+
 .data-table-scroll {
   max-height: 70vh;
   overflow: auto;
+  scrollbar-width: none;
+}
+
+.data-table-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.data-table-ybar {
+  position: absolute;
+  right: 2px;
+  z-index: 4;
+  width: 8px;
+  pointer-events: none;
+}
+
+.data-table-thumb {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  border-radius: 4px;
+  background: rgba(108, 117, 125, 0.75);
+  pointer-events: auto;
+  cursor: default;
+}
+
+.data-table-thumb[hidden] {
+  display: none;
+}
+
+.data-table {
+  --table-line: #dee2e6;
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.data-table.data-table > :not(caption) > * > * {
+  border-style: solid;
+  border-color: var(--table-line);
+  border-width: 0 1px 1px 0;
+}
+
+.data-table.data-table > :not(caption) > * > *:last-child {
+  border-right-width: 0;
+}
+
+.data-table.data-table > tbody > tr:last-child > td {
+  border-bottom-width: 0;
+}
+
+.data-table.data-table > thead > tr > th {
+  position: relative;
+  background-color: #fff;
+  border-bottom-width: 1px;
+  border-bottom-color: var(--table-line);
+  box-shadow: none;
+}
+
+.data-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.data-table-label {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.data-table-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  width: 10px;
+  height: 100%;
+  transform: translateX(50%);
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.data-table-resizer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: transparent;
+}
+
+.data-table-resizer:hover::after {
+  width: 2px;
+  background: var(--bs-primary, #0d6efd);
+}
+
+.brand-list-scroll {
+  --brand-row-height: 4.25rem;
+  max-height: calc(var(--brand-row-height) * 10);
+  overflow-y: auto;
+}
+
+.brand-list-scroll .list-group-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: var(--brand-row-height);
+  overflow: hidden;
+}
+
+.data-table-scroll thead .data-table-sort {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  vertical-align: baseline;
 }

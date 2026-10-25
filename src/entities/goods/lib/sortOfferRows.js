@@ -30,13 +30,47 @@ function compareDefault(left, right) {
   return left.price - right.price
 }
 
+export function nextColumnSort(current, key) {
+  if (!current || current.key !== key) {
+    return { key, direction: 'asc' }
+  }
+  if (current.direction === 'asc') {
+    return { key, direction: 'desc' }
+  }
+  return null
+}
+
+const textValue = {
+  name: (row) => row.name,
+  brand: (row) => row.brand,
+  number: (row) => row.number,
+  warehouse: (row) => row.warehouseCode || '—',
+  role: (row) => roleLabel(row.role),
+  notRefund: (row) => (row.notRefund ? 'Да' : 'Нет'),
+}
+
 function compareByColumn(left, right, sort) {
   const direction = sort.direction === 'desc' ? -1 : 1
   if (sort.key === 'price') {
     return (left.price - right.price) * direction
   }
-  const field = sort.key === 'brand' ? 'brand' : 'name'
-  return textCollator.compare(left[field], right[field]) * direction
+  if (sort.key === 'stock') {
+    return (left.stock - right.stock) * direction
+  }
+  if (sort.key === 'shipment') {
+    return (shipmentTime(left) - shipmentTime(right)) * direction
+  }
+  const read = textValue[sort.key] || textValue.name
+  return textCollator.compare(read(left), read(right)) * direction
+}
+
+function shipmentTime(row) {
+  const time = Date.parse(row.shipmentDate)
+  return Number.isFinite(time) ? time : 0
+}
+
+function roleLabel(role) {
+  return role === 'analogue' ? 'Аналог' : 'Позиция'
 }
 
 function roleRank(role) {

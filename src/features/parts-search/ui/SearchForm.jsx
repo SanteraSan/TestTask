@@ -1,25 +1,27 @@
 import { Button, TextField } from '@/shared/ui'
 
-export function SearchForm({ value, onChange, onClear }) {
+export function SearchForm({ value, onChange, onSearch, canSearch }) {
   return (
-    <form role="search" onSubmit={(event) => event.preventDefault()}>
-      <div className="row g-2 align-items-end">
-        <div className="col-sm">
-          <TextField
-            id="article-number"
-            label="Артикул"
-            value={value}
-            onChange={onChange}
-            placeholder="Например, 01089"
-            hint="Список производителей обновится после ввода"
-          />
-        </div>
-        <div className="col-sm-auto">
-          <Button variant="outline-secondary" onClick={onClear} disabled={!value}>
-            Очистить
+    <form
+      role="search"
+      onSubmit={(event) => {
+        event.preventDefault()
+        onSearch()
+      }}
+    >
+      <TextField
+        id="article-number"
+        label="Артикул"
+        value={value}
+        onChange={onChange}
+        placeholder="Например, 01089"
+        hint="Список производителей обновится после ввода"
+        trailing={(
+          <Button type="submit" variant="primary" disabled={!canSearch}>
+            Поиск
           </Button>
-        </div>
-      </div>
+        )}
+      />
     </form>
   )
 }

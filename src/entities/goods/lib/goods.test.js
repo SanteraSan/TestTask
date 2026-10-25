@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { formatShipmentDate } from './format'
 import { isEmptyGood, normalizeGoods } from './normalizeGoods'
-import { sortOfferRows } from './sortOfferRows'
+import { nextColumnSort, sortOfferRows } from './sortOfferRows'
 import { toBrandOptions } from './toBrandOptions'
 import { toOfferRows } from './toOfferRows'
 
@@ -163,6 +163,55 @@ describe('goods mappers', () => {
     expect(sortOfferRows(rows, { key: 'brand', direction: 'asc' }).map((item) => item.id)).toEqual(['2', '3', '1'])
     expect(sortOfferRows(rows, { key: 'price', direction: 'asc' }).map((item) => item.id)).toEqual(['2', '3', '1'])
     expect(sortOfferRows(rows, { key: 'price', direction: 'desc' }).map((item) => item.id)).toEqual(['1', '2', '3'])
+  })
+
+  it('sorts by offer type and cycles a column back to the default order', () => {
+    const rows = [
+      row({ id: 'original', role: 'original' }),
+      row({ id: 'analogue', role: 'analogue' }),
+    ]
+
+    expect(sortOfferRows(rows, { key: 'role', direction: 'asc' }).map((item) => item.id)).toEqual(['analogue', 'original'])
+    expect(sortOfferRows(rows, { key: 'role', direction: 'desc' }).map((item) => item.id)).toEqual(['original', 'analogue'])
+    expect(nextColumnSort(null, 'role')).toEqual({ key: 'role', direction: 'asc' })
+    expect(nextColumnSort({ key: 'role', direction: 'asc' }, 'role')).toEqual({ key: 'role', direction: 'desc' })
+    expect(nextColumnSort({ key: 'role', direction: 'desc' }, 'role')).toBeNull()
+    expect(sortOfferRows(rows, null).map((item) => item.id)).toEqual(['original', 'analogue'])
+  })
+
+  it('sorts number, warehouse, shipment, stock and refund flag', () => {
+    const rows = [
+      row({
+        id: 'late',
+        number: '100',
+        warehouseCode: 'СПБ',
+        shipmentDate: '2026-10-28T10:00:00+03:00',
+        stock: 2,
+        notRefund: false,
+      }),
+      row({
+        id: 'early',
+        number: '3',
+        warehouseCode: 'ДМД',
+        shipmentDate: '2026-10-26T10:00:00+03:00',
+        stock: 10,
+        notRefund: true,
+      }),
+      row({
+        id: 'middle',
+        number: '20',
+        warehouseCode: 'МСК',
+        shipmentDate: '',
+        stock: 1,
+        notRefund: false,
+      }),
+    ]
+
+    expect(sortOfferRows(rows, { key: 'number', direction: 'asc' }).map((item) => item.id)).toEqual(['early', 'middle', 'late'])
+    expect(sortOfferRows(rows, { key: 'warehouse', direction: 'asc' }).map((item) => item.id)).toEqual(['early', 'middle', 'late'])
+    expect(sortOfferRows(rows, { key: 'shipment', direction: 'asc' }).map((item) => item.id)).toEqual(['middle', 'early', 'late'])
+    expect(sortOfferRows(rows, { key: 'stock', direction: 'desc' }).map((item) => item.id)).toEqual(['early', 'late', 'middle'])
+    expect(sortOfferRows(rows, { key: 'notRefund', direction: 'asc' }).map((item) => item.id)).toEqual(['early', 'late', 'middle'])
   })
 })
 

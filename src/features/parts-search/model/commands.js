@@ -3,10 +3,10 @@ import { fetchBrands, fetchOffers, numberChanged, resultsCleared, brandChosen } 
 let brandsRequest = null
 let offersRequest = null
 
-export function requestBrands(number) {
+export function requestBrands(number, { force = false } = {}) {
   return (dispatch, getState) => {
     const state = getState().partsSearch
-    if (state.query === number && (state.brandsStatus === 'loading' || state.brandsStatus === 'success')) {
+    if (!force && state.query === number && (state.brandsStatus === 'loading' || state.brandsStatus === 'success')) {
       return undefined
     }
     offersRequest?.abort()

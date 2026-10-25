@@ -1,4 +1,4 @@
-import { formatPrice, formatShipmentDate } from '@/entities/goods'
+import { formatPrice } from '@/entities/goods'
 import { AlertMessage, DataTable, EmptyState, Loader } from '@/shared/ui'
 
 const columns = [
@@ -6,7 +6,7 @@ const columns = [
     key: 'name',
     title: 'Название',
     sortable: true,
-    maxWidth: 280,
+    weight: 2,
     render: (row) => row.name,
     titleOf: (row) => row.name,
   },
@@ -14,54 +14,33 @@ const columns = [
     key: 'brand',
     title: 'Производитель',
     sortable: true,
-    maxWidth: 180,
+    weight: 1,
     render: (row) => row.brand,
     titleOf: (row) => row.brand,
   },
   {
     key: 'number',
     title: 'Номер',
-    maxWidth: 160,
+    sortable: true,
+    weight: 1,
     render: (row) => row.number,
     titleOf: (row) => row.number,
-  },
-  {
-    key: 'warehouse',
-    title: 'Склад',
-    maxWidth: 120,
-    render: (row) => row.warehouseCode || '—',
-    titleOf: (row) => row.warehouseCode,
-  },
-  {
-    key: 'shipment',
-    title: 'Отгрузка',
-    maxWidth: 160,
-    render: (row) => formatShipmentDate(row.shipmentDate),
   },
   {
     key: 'price',
     title: 'Цена',
     sortable: true,
-    maxWidth: 140,
+    weight: 1,
     render: (row) => formatPrice(row.price),
+    titleOf: (row) => formatPrice(row.price),
   },
   {
     key: 'stock',
     title: 'Остаток',
-    maxWidth: 110,
+    sortable: true,
+    weight: 1,
     render: (row) => `${row.stock} шт.`,
-  },
-  {
-    key: 'role',
-    title: 'Тип',
-    maxWidth: 120,
-    render: (row) => (row.role === 'analogue' ? 'Аналог' : 'Позиция'),
-  },
-  {
-    key: 'notRefund',
-    title: 'Невозврат',
-    maxWidth: 120,
-    render: (row) => (row.notRefund ? 'Да' : 'Нет'),
+    titleOf: (row) => `${row.stock} шт.`,
   },
 ]
 

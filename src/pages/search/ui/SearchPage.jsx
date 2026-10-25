@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { sortOfferRows } from '@/entities/goods'
+import { nextColumnSort, sortOfferRows } from '@/entities/goods'
 import {
   SearchForm,
   changeNumber,
@@ -52,6 +52,7 @@ export function SearchPage() {
   }, [debouncedNumber])
 
   const sortedRows = useMemo(() => sortOfferRows(offers, sort), [offers, sort])
+  const brandsReady = brandsStatus === 'success' && brands.length > 0
 
   function handleNumberChange(value) {
     dispatch(changeNumber(value))
@@ -60,13 +61,16 @@ export function SearchPage() {
     }
   }
 
+  function handleSearch() {
+    const query = number.trim()
+    if (query.length < MIN_QUERY_LENGTH || brandsStatus === 'loading') {
+      return
+    }
+    dispatch(requestBrands(query, { force: true }))
+  }
+
   function handleSort(key) {
-    setSort((current) => {
-      if (!current || current.key !== key) {
-        return { key, direction: 'asc' }
-      }
-      return { key, direction: current.direction === 'asc' ? 'desc' : 'asc' }
-    })
+    setSort((current) => nextColumnSort(current, key))
   }
 
   return (
@@ -83,7 +87,8 @@ export function SearchPage() {
           <SearchForm
             value={number}
             onChange={handleNumberChange}
-            onClear={() => handleNumberChange('')}
+            onSearch={handleSearch}
+            canSearch={number.trim().length >= MIN_QUERY_LENGTH && brandsStatus !== 'loading'}
           />
         </div>
       </section>
@@ -100,19 +105,21 @@ export function SearchPage() {
         />
       </section>
 
-      <section>
-        <h2 className="h5">Предложения</h2>
-        <OffersBoard
-          status={offersStatus}
-          error={offersError}
-          rows={sortedRows}
-          sort={sort}
-          onSortChange={handleSort}
-          onRetry={() => dispatch(retryOffers())}
-          brandsReady={brandsStatus === 'success' && brands.length > 0}
-          resetKey={selectedBrandId || 'none'}
-        />
-      </section>
+      {brandsReady ? (
+        <section>
+          <h2 className="h5">Предложения</h2>
+          <OffersBoard
+            status={offersStatus}
+            error={offersError}
+            rows={sortedRows}
+            sort={sort}
+            onSortChange={handleSort}
+            onRetry={() => dispatch(retryOffers())}
+            brandsReady={brandsReady}
+            resetKey={selectedBrandId || 'none'}
+          />
+        </section>
+      ) : null}
     </main>
   )
 }
