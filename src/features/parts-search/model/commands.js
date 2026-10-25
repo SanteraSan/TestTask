@@ -1,4 +1,13 @@
-import { fetchBrands, fetchOffers, numberChanged, resultsCleared, brandChosen } from './partsSearchSlice'
+import {
+  fetchBrands,
+  fetchOffers,
+  numberChanged,
+  resultsCleared,
+  brandChosen,
+  brandsRestored,
+  offersRestored,
+} from './partsSearchSlice'
+import { brandsCacheKey, offersCacheKey, searchCache } from './searchCache'
 
 let brandsRequest = null
 let offersRequest = null
@@ -8,6 +17,16 @@ export function requestBrands(number, { force = false } = {}) {
     const state = getState().partsSearch
     if (!force && state.query === number && (state.brandsStatus === 'loading' || state.brandsStatus === 'success')) {
       return undefined
+    }
+    if (!force) {
+      const cached = searchCache.read(brandsCacheKey(number))
+      if (cached !== undefined) {
+        offersRequest?.abort()
+        brandsRequest?.abort()
+        brandsRequest = null
+        dispatch(brandsRestored({ number, brands: cached }))
+        return undefined
+      }
     }
     offersRequest?.abort()
     brandsRequest?.abort()
@@ -33,6 +52,12 @@ export function requestOffers(brandOption) {
   return (dispatch, getState) => {
     const { query } = getState().partsSearch
     dispatch(brandChosen(brandOption))
+    const cached = searchCache.read(offersCacheKey(query, brandOption.brand))
+    if (cached !== undefined) {
+      offersRequest?.abort()
+      dispatch(offersRestored(cached))
+      return undefined
+    }
     offersRequest?.abort()
     offersRequest = dispatch(fetchOffers({ number: query, brand: brandOption.brand }))
     return offersRequest

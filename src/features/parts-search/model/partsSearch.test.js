@@ -8,12 +8,16 @@ import {
   requestOffers,
   resetPartsSearchRuntime,
   retryBrands,
+  retryOffers,
 } from './commands'
 import { fetchBrands, partsSearchReducer } from './partsSearchSlice'
+import { SEARCH_CACHE_TTL_MS, searchCache } from './searchCache'
 
 describe('partsSearch', () => {
   beforeEach(() => {
     resetPartsSearchRuntime()
+    searchCache.clear()
+    searchCache.setNow(() => Date.now())
   })
 
   it('stores manufacturers and drops the not-found placeholder', async () => {
@@ -121,6 +125,52 @@ describe('partsSearch', () => {
     expect(searchByNumber).toHaveBeenCalledTimes(2)
   })
 
+  it('reuses a manufacturer response for a minute and then refreshes it', async () => {
+    let now = 1_000
+    searchCache.setNow(() => now)
+    const searchByNumber = vi.fn()
+      .mockResolvedValueOnce({ goods: [good('FEBI')] })
+      .mockResolvedValueOnce({ goods: [good('ASAM')] })
+    configurePartsApi({ searchByNumber })
+    const store = createStore()
+
+    await store.dispatch(requestBrands('01089'))
+    store.dispatch(clearSearchResults())
+    await store.dispatch(requestBrands('01089'))
+
+    expect(searchByNumber).toHaveBeenCalledTimes(1)
+    expect(store.getState().partsSearch.brands.map((item) => item.brand)).toEqual(['FEBI'])
+
+    now += SEARCH_CACHE_TTL_MS
+    store.dispatch(clearSearchResults())
+    await store.dispatch(requestBrands('01089'))
+
+    expect(searchByNumber).toHaveBeenCalledTimes(2)
+    expect(store.getState().partsSearch.brands.map((item) => item.brand)).toEqual(['ASAM'])
+  })
+
+  it('reuses offers for the same brand until the cache minute expires', async () => {
+    let now = 5_000
+    searchCache.setNow(() => now)
+    const searchAnalogues = vi.fn(async () => ({ goods: [good('FEBI')] }))
+    configurePartsApi({
+      searchByNumber: async () => ({ goods: [good('FEBI')] }),
+      searchAnalogues,
+    })
+    const store = createStore()
+    await store.dispatch(requestBrands('01089'))
+    const brand = { id: 'FEBI', brand: 'FEBI' }
+
+    await store.dispatch(requestOffers(brand))
+    await store.dispatch(requestOffers(brand))
+    expect(searchAnalogues).toHaveBeenCalledTimes(1)
+    expect(store.getState().partsSearch.offersStatus).toBe('success')
+
+    now += SEARCH_CACHE_TTL_MS
+    await store.dispatch(requestOffers(brand))
+    expect(searchAnalogues).toHaveBeenCalledTimes(2)
+  })
+
   it('loads offers for the chosen brand and keeps brands on failure', async () => {
     const searchAnalogues = vi
       .fn()
@@ -159,7 +209,7 @@ describe('partsSearch', () => {
     expect(state.offers).toHaveLength(2)
     expect(state.brands).toHaveLength(1)
 
-    await store.dispatch(requestOffers({ id: 'FEBI', brand: 'FEBI' }))
+    await store.dispatch(retryOffers())
     state = store.getState().partsSearch
     expect(state.brandsStatus).toBe('success')
     expect(state.brands).toHaveLength(1)

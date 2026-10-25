@@ -38,7 +38,7 @@ export function BrandList({ status, error, items, selectedId, onSelect, onRetry 
           <>
             <span className="d-block text-truncate">
               <span className="fw-semibold">{item.brand}</span>
-              {item.number ? <span> {item.number}</span> : null}
+              {item.number ? <span> Арт.: {item.number}</span> : null}
             </span>
             {item.name ? <span className="d-block small text-truncate">{item.name}</span> : null}
           </>

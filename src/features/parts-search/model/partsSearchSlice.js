@@ -2,13 +2,16 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toBrandOptions, toOfferRows } from '@/entities/goods'
 import { isAbortError } from '@/shared/api'
 import { getPartsApi } from './api'
+import { brandsCacheKey, offersCacheKey, searchCache } from './searchCache'
 
 export const fetchBrands = createAsyncThunk(
   'partsSearch/fetchBrands',
   async (number, { signal, rejectWithValue }) => {
     try {
       const { goods } = await getPartsApi().searchByNumber(number, { signal })
-      return toBrandOptions(goods)
+      const brands = toBrandOptions(goods)
+      searchCache.write(brandsCacheKey(number), brands)
+      return brands
     } catch (error) {
       return rejectWithValue(toErrorPayload(error))
     }
@@ -20,7 +23,9 @@ export const fetchOffers = createAsyncThunk(
   async ({ number, brand }, { signal, rejectWithValue }) => {
     try {
       const { goods } = await getPartsApi().searchAnalogues(number, brand, { signal })
-      return toOfferRows(goods)
+      const offers = toOfferRows(goods)
+      searchCache.write(offersCacheKey(number, brand), offers)
+      return offers
     } catch (error) {
       return rejectWithValue(toErrorPayload(error))
     }
@@ -71,6 +76,22 @@ const partsSearchSlice = createSlice({
     brandChosen(state, action) {
       state.selectedBrandId = action.payload.id
       state.selectedBrand = action.payload.brand
+    },
+    brandsRestored(state, action) {
+      state.query = action.payload.number
+      state.brandsStatus = 'success'
+      state.brandsError = null
+      state.brands = action.payload.brands
+      state.selectedBrandId = null
+      state.selectedBrand = null
+      state.offers = []
+      state.offersStatus = 'idle'
+      state.offersError = null
+    },
+    offersRestored(state, action) {
+      state.offersStatus = 'success'
+      state.offersError = null
+      state.offers = action.payload
     },
   },
   extraReducers(builder) {
@@ -132,5 +153,11 @@ function isCurrentOffer(state, arg) {
   return state.query === arg?.number && state.selectedBrand === arg?.brand
 }
 
-export const { numberChanged, resultsCleared, brandChosen } = partsSearchSlice.actions
+export const {
+  numberChanged,
+  resultsCleared,
+  brandChosen,
+  brandsRestored,
+  offersRestored,
+} = partsSearchSlice.actions
 export const partsSearchReducer = partsSearchSlice.reducer
