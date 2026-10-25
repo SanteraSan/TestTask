@@ -22,3 +22,5 @@ npm run build
 ## Стек
 
 React, Redux Toolkit, Axios, Bootstrap 5, Vite. Серверное состояние хранится в Redux, запросы выполняет класс `HsPriceApi`.
+
+Контракт сервиса описан в `docs/openapi.yaml`. Клиент сам разбирает JSON и не опирается на `Content-Type`: бизнес-ошибка может прийти и при HTTP 200 с заголовком `text/plain`.

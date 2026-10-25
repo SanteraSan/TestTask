@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  title: Favorit Проценка
+  version: "2023-03-06"
+  description: |
+    Контракт GET-сервиса поиска автозапчастей и аналогов.
+    Сверен с wsprice.pdf и живыми ответами api.favorit-parts.ru.
+servers:
+  - url: http://api.favorit-parts.ru/hs/hsprice
+paths:
+  /:
+    get:
+      operationId: searchGoods
+      summary: Найти детали по артикулу и, при необходимости, аналоги
+      parameters:
+        - $ref: "#/components/parameters/key"
+        - $ref: "#/components/parameters/number"
+        - $ref: "#/components/parameters/brand"
+        - $ref: "#/components/parameters/analogues"
+        - $ref: "#/components/parameters/info"
+      responses:
+        "200":
+          description: |
+            Список товаров либо бизнес-ошибка в теле.
+            Пустой номер возвращает error при HTTP 200 и Content-Type text/plain.
+            Ненайденный артикул возвращает один пустой элемент goods.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/GoodsResponse"
+                  - $ref: "#/components/schemas/ErrorResponse"
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Неверный ключ покупателя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: Invalid access key
+components:
+  parameters:
+    key:
+      name: key
+      in: query
+      required: true
+      description: Уникальный ключ покупателя
+      schema:
+        type: string
+    number:
+      name: number
+      in: query
+      required: true
+      description: Номер детали. Спецсимволы нужно кодировать.
+      schema:
+        type: string
+    brand:
+      name: brand
+      in: query
+      required: false
+      description: Производитель. Без него сервис возвращает детали всех брендов с этим номером.
+      schema:
+        type: string
+    analogues:
+      name: analogues
+      in: query
+      required: false
+      description: Значение on вместе с brand включает массив аналогов.
+      schema:
+        type: string
+        enum: ["on"]
+    info:
+      name: info
+      in: query
+      required: false
+      description: Значение on добавляет признак невозвратной позиции notRefund.
+      schema:
+        type: string
+        enum: ["on"]
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: Текст одной или нескольких ошибок сервиса
+          examples:
+            - Empty key!
+            - Invalid access key
+            - Empty number goods!
+            - Request quota exceeded!
+    GoodsResponse:
+      type: object
+      required: [goods]
+      properties:
+        goods:
+          type: array
+          items:
+            $ref: "#/components/schemas/Good"
+    Good:
+      type: object
+      properties:
+        goodsID:
+          type: string
+        brand:
+          type: string
+        number:
+          type: string
+        name:
+          type: string
+        count:
+          type: integer
+          description: Остаток на всех складах
+        price:
+          type: number
+          description: Устаревшее поле совместимости. Для отображения берётся цена склада.
+        rate:
+          type: integer
+        notRefund:
+          type: boolean
+        analogues:
+          type: array
+          description: Присутствует, если переданы brand и analogues=on
+          items:
+            $ref: "#/components/schemas/Good"
+        warehouses:
+          type: array
+          items:
+            $ref: "#/components/schemas/Warehouse"
+    Warehouse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Сокращённое имя склада. Есть не у всех складов.
+        id:
+          type: string
+        own:
+          type: boolean
+        shipmentDate:
+          type: string
+          description: Дата отгрузки и время, до которого нужно заказать
+          example: "2026-10-27T18:00:00+03:00"
+        price:
+          type: number
+        stock:
+          type: integer
+        notRefund:
+          type: boolean
+        warehouseShipping:
+          type: string
+          description: Служебный идентификатор отгрузки. В интерфейсе не используется.
