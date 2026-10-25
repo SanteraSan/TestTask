@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { formatShipmentDate } from './format'
 import { isEmptyGood, normalizeGoods } from './normalizeGoods'
 import { sortOfferRows } from './sortOfferRows'
 import { toBrandOptions } from './toBrandOptions'
@@ -142,6 +143,12 @@ describe('goods mappers', () => {
     ], null)
 
     expect(rows.map((item) => item.id)).toEqual(['d', 'c', 'b', 'a'])
+  })
+
+  it('shows shipment time in the service timezone', () => {
+    expect(formatShipmentDate('2026-10-27T18:00:00+03:00')).toBe('27.10.2026, 18:00')
+    expect(formatShipmentDate('')).toBe('—')
+    expect(formatShipmentDate('not-a-date')).toBe('—')
   })
 
   it('sorts the whole list by name, brand and price', () => {

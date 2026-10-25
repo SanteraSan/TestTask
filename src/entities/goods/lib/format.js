@@ -4,11 +4,6 @@ const priceFormatter = new Intl.NumberFormat('ru-RU', {
   maximumFractionDigits: 2,
 })
 
-const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
-  dateStyle: 'short',
-  timeStyle: 'short',
-})
-
 export function formatPrice(value) {
   const amount = Number(value)
   if (!Number.isFinite(amount)) {
@@ -18,12 +13,10 @@ export function formatPrice(value) {
 }
 
 export function formatShipmentDate(value) {
-  if (!value) {
+  const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/)
+  if (!match) {
     return '—'
   }
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) {
-    return '—'
-  }
-  return dateFormatter.format(date)
+  const [, year, month, day, hour, minute] = match
+  return `${day}.${month}.${year}, ${hour}:${minute}`
 }

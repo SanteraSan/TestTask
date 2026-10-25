@@ -1,4 +1,5 @@
 export { configurePartsApi } from './model/api'
+export { SearchForm } from './ui/SearchForm'
 export {
   changeNumber,
   clearSearchResults,
