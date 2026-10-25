@@ -1,5 +1,5 @@
 import { ApiError } from './ApiError'
-import { apiMessages } from './messages'
+import { apiMessages, translateBusinessError } from './messages'
 
 export class HsPriceApi {
   constructor(http, { apiKey }) {
@@ -27,7 +27,7 @@ export class HsPriceApi {
     if (!this.apiKey) {
       throw new ApiError({
         kind: 'business',
-        message: 'Empty key!',
+        message: translateBusinessError('Empty key!'),
       })
     }
 

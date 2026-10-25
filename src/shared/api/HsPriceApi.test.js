@@ -58,7 +58,7 @@ describe('HsPriceApi', () => {
     await expect(api.searchByNumber('01089')).rejects.toBeInstanceOf(ApiError)
     await expect(api.searchByNumber('01089')).rejects.toMatchObject({
       kind: 'business',
-      message: 'Empty key!',
+      message: 'Не указан ключ покупателя.',
     })
     expect(get).not.toHaveBeenCalled()
   })

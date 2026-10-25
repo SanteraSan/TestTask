@@ -1,5 +1,5 @@
 import { ApiError } from './ApiError'
-import { apiMessages } from './messages'
+import { apiMessages, translateBusinessError } from './messages'
 
 export class HttpClient {
   constructor(axiosInstance) {
@@ -31,7 +31,7 @@ export function interpretResponse(status, raw) {
   if (businessMessage) {
     throw new ApiError({
       kind: 'business',
-      message: businessMessage,
+      message: translateBusinessError(businessMessage),
       status,
     })
   }

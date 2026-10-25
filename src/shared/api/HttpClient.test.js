@@ -26,7 +26,7 @@ describe('HttpClient', () => {
     await expect(http.get('/')).rejects.toMatchObject({
       name: 'ApiError',
       kind: 'business',
-      message: 'Empty number goods!',
+      message: apiMessages.emptyNumber,
       status: 200,
     })
   })
@@ -39,9 +39,23 @@ describe('HttpClient', () => {
 
     await expect(http.get('/')).rejects.toMatchObject({
       kind: 'business',
-      message: 'Invalid access key',
+      message: apiMessages.invalidKey,
       status: 403,
     })
+  })
+
+  it('translates the request quota message and keeps an unknown error text', async () => {
+    const quota = clientWith(async () => ({
+      status: 200,
+      data: '{"error":"Request quota exceeded!"}',
+    }))
+    const unknown = clientWith(async () => ({
+      status: 200,
+      data: '{"error":"Склад временно закрыт"}',
+    }))
+
+    await expect(quota.get('/')).rejects.toMatchObject({ message: apiMessages.quota })
+    await expect(unknown.get('/')).rejects.toMatchObject({ message: 'Склад временно закрыт' })
   })
 
   it('reports a parse error when an error status has a non-JSON body', async () => {
@@ -127,7 +141,7 @@ describe('HttpClient', () => {
 
     await expect(http.get('/')).rejects.toMatchObject({
       kind: 'business',
-      message: 'Invalid access key',
+      message: apiMessages.invalidKey,
       status: 403,
     })
   })
